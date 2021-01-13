@@ -166,6 +166,39 @@ app.command('/karma-channel-personal', async ({ command, ack, client }) => {
     })
 })
 
+app.command('/karma-channel-user', async ({ command, ack, client }) => {
+    await ack()
+    console.log(command)
+    const userID = command.text.match(/<@(.*)\|.*>/i)[1]
+    if (userID) {
+        const karma = await prisma.user.findUnique({
+            where: {
+                id_channelId: {
+                    id: userID,
+                    channelId: command.channel_id
+                }
+            },
+            select: {
+                id: false,
+                channelId: false,
+                channel: false,
+                karmaForChannel: true
+            }
+        })
+
+        client.chat.postEphemeral({
+            channel: command.channel_id,
+            user: command.user_id,
+            text: `<@${userID}> has a total of ${karma ? karma.karmaForChannel : 0} Karma in <#${command.channel_id}> ${getRandomEmoji()}`
+        })
+    } else {
+        client.chat.postEphemeral({
+            channel: command.channel_id,
+            user: command.user_id,
+            text: `Command parse error. Make sure you include a mention in your command`
+        })
+    }
+})
 async function main() {
     await app.start(process.env.PORT || 3000)
     console.log('⚡️ Bolt app is running!')
