@@ -33,6 +33,19 @@ app.event("reaction_added", async ({ event, client }) => {
         console.log(`${event.user} downvoted ${event.item_user}`)
     }
 })
+
+app.event("reaction_removed", async ({ event }) => {
+    if (event.reaction === "upvote") {
+        if (event.user === event.item_user) return
+        await modifyKarma(-1, event.item_user, event.item.channel)
+        console.log(`${event.user} removed upvote from ${event.item_user}`)
+    } else if (event.reaction === "downvote") {
+        if (event.user === event.item_user) return
+        await modifyKarma(1, event.item_user, event.item.channel)
+        console.log(`${event.user} removed downvote from ${event.item_user}`)
+    }
+})
+
 async function main() {
     await app.start(process.env.PORT || 3000)
     console.log('⚡️ Bolt app is running!')
