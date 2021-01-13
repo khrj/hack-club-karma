@@ -247,6 +247,44 @@ app.command('/karma-distribution-user', async ({ command, ack, client }) => {
     }
 })
 
+app.command('/karma-distribution-personal', async ({ command, ack, client }) => {
+    await ack()
+    console.log(command)
+
+    let build = "Distribution of your Karma:\n"
+
+    const karma = await prisma.user.findMany({
+        where: {
+            id: command.user_id
+        },
+        select: {
+            id: false,
+            channelId: true,
+            channel: false,
+            karmaForChannel: true
+        },
+        orderBy: {
+            karmaForChannel: 'desc'
+        }
+    })
+
+    console.log(karma.join)
+
+    let totalKarma = 0
+    for (const channel of karma) {
+        build += `\n<#${channel.channelId}>: ${channel.karmaForChannel}`
+        totalKarma += channel.karmaForChannel
+    }
+
+    build += `\n\nTotal Karma: ${totalKarma}`
+
+    client.chat.postEphemeral({
+        channel: command.channel_id,
+        user: command.user_id,
+        text: build
+    })
+})
+
 async function main() {
     await app.start(process.env.PORT || 3000)
     console.log('⚡️ Bolt app is running!')
