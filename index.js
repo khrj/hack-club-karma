@@ -285,6 +285,29 @@ app.command('/karma-distribution-personal', async ({ command, ack, client }) => 
     })
 })
 
+app.command('/karma-enable', async ({ command, ack, client }) => {
+    await ack()
+        await prisma.channel.upsert({
+            where: { id: command.channel_id },
+            create: {
+                id: command.channel_id,
+                enabled: true
+            },
+            update: { enabled: true }
+        })
+        try {
+            await client.conversations.join({
+                channel: command.channel_id
+            })
+        } catch {
+            // Already in channel 
+        }
+        await client.chat.postEphemeral({
+            channel: command.channel_id,
+            user: command.user_id,
+            text: `Enabled Karma for <#${command.channel_id}>`
+        })
+})
 async function main() {
     await app.start(process.env.PORT || 3000)
     console.log('⚡️ Bolt app is running!')
