@@ -199,6 +199,54 @@ app.command('/karma-channel-user', async ({ command, ack, client }) => {
         })
     }
 })
+
+app.command('/karma-distribution-user', async ({ command, ack, client }) => {
+    await ack()
+    console.log(command)
+    const userID = command.text.match(/<@(.*)\|.*>/i)[1]
+    if (userID) {
+        let build = `Distribution of <@${userID}>'s Karma:\n`
+
+        const karma = await prisma.user.findMany({
+            where: {
+                id: userID
+            },
+            select: {
+                id: false,
+                channelId: true,
+                channel: false,
+                karmaForChannel: true
+            },
+            orderBy: {
+                karmaForChannel: 'desc'
+            }
+        })
+
+        console.log(karma.join)
+
+        let totalKarma = 0
+        for (const channel of karma) {
+            build += `\n<#${channel.channelId}>: ${channel.karmaForChannel}`
+            totalKarma += channel.karmaForChannel
+        }
+
+        build += `\n\nTotal Karma: ${totalKarma}`
+
+        client.chat.postEphemeral({
+            channel: command.channel_id,
+            user: command.user_id,
+            text: build
+        })
+
+    } else {
+        client.chat.postEphemeral({
+            channel: command.channel_id,
+            user: command.user_id,
+            text: `Command parse error. Make sure you include a mention in your command`
+        })
+    }
+})
+
 async function main() {
     await app.start(process.env.PORT || 3000)
     console.log('⚡️ Bolt app is running!')
