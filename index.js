@@ -78,6 +78,32 @@ async function modifyKarma(amount, user, channel) {
         })
     }
 }
+app.command('/karma-global-personal', async ({ command, ack, client }) => {
+    await ack()
+    console.log(command)
+    const karma = await prisma.user.findMany({
+        where: {
+            id: command.user_id
+        },
+        select: {
+            id: false,
+            channelId: false,
+            channel: false,
+            karmaForChannel: true
+        }
+    })
+
+    let totalKarma = 0
+    for (const channel of karma) {
+        totalKarma += channel.karmaForChannel
+    }
+
+    client.chat.postEphemeral({
+        channel: command.channel_id,
+        user: command.user_id,
+        text: `You have a total of ${totalKarma} Karma across channels ${getRandomEmoji()}`
+    })
+})
 async function main() {
     await app.start(process.env.PORT || 3000)
     console.log('⚡️ Bolt app is running!')
