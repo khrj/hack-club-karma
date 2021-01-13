@@ -308,6 +308,27 @@ app.command('/karma-enable', async ({ command, ack, client }) => {
             text: `Enabled Karma for <#${command.channel_id}>`
         })
 })
+app.command('/karma-disable', async ({ command, ack, client }) => {
+    await ack()
+        await prisma.channel.upsert({
+            where: { id: command.channel_id },
+            create: {
+                id: command.channel_id,
+                enabled: false
+            },
+            update: { enabled: false }
+        })
+        await client.chat.postEphemeral({
+            channel: command.channel_id,
+            user: command.user_id,
+            text: `Disabled Karma for <#${command.channel_id}>`
+        })
+        await client.chat.postEphemeral({
+            channel: command.channel_id,
+            user: command.user_id,
+            text: "Unfortunately, you don't have authorization to do that"
+        })
+})
 async function main() {
     await app.start(process.env.PORT || 3000)
     console.log('⚡️ Bolt app is running!')
