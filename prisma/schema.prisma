@@ -1,0 +1,26 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Channel {
+  id      String  @id
+  enabled Boolean @default(false)
+  users   User[]
+}
+
+model User {
+  id              String
+  channelId       String
+  karmaForChannel Int
+  channel         Channel @relation(fields: [channelId], references: [id])
+  @@id([id, channelId])
+}
+
+model BannedUsers {
+  id String @id
+}
