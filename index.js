@@ -7,6 +7,13 @@ const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
 })
 
+const admins = [
+    "U01C21G88QM", // Khushraj
+    "UDFBPS5CZ", // Edwin
+    "U013B6CPV62", // Caleb
+    "UARKJATPW" // Claire
+]
+
 app.event("reaction_added", async ({ event, client }) => {
     console.log(event)
     if (event.reaction === "upvote") {
@@ -287,6 +294,7 @@ app.command('/karma-distribution-personal', async ({ command, ack, client }) => 
 
 app.command('/karma-enable', async ({ command, ack, client }) => {
     await ack()
+    if (admins.includes(command.user_id)) {
         await prisma.channel.upsert({
             where: { id: command.channel_id },
             create: {
@@ -307,9 +315,18 @@ app.command('/karma-enable', async ({ command, ack, client }) => {
             user: command.user_id,
             text: `Enabled Karma for <#${command.channel_id}>`
         })
+    } else {
+        await client.chat.postEphemeral({
+            channel: command.channel_id,
+            user: command.user_id,
+            text: "Unfortunately, you don't have authorization to do that"
+        })
+    }
 })
+
 app.command('/karma-disable', async ({ command, ack, client }) => {
     await ack()
+    if (admins.includes(command.user_id)) {
         await prisma.channel.upsert({
             where: { id: command.channel_id },
             create: {
@@ -323,15 +340,28 @@ app.command('/karma-disable', async ({ command, ack, client }) => {
             user: command.user_id,
             text: `Disabled Karma for <#${command.channel_id}>`
         })
+    } else {
         await client.chat.postEphemeral({
             channel: command.channel_id,
             user: command.user_id,
             text: "Unfortunately, you don't have authorization to do that"
         })
+    }
 })
+
 async function main() {
     await app.start(process.env.PORT || 3000)
     console.log('⚡️ Bolt app is running!')
 }
 
 main()
+
+function getRandomEmoji() {
+    const emojis = [
+        ':sunglasses:',
+        ':parrot:',
+        ':yay:',
+        ':eyes:'
+    ]
+    return emojis[Math.floor(Math.random() * emojis.length)]
+}
