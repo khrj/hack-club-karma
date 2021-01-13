@@ -1,0 +1,2 @@
+# HackClubKarma
+Karma system @hackclub
