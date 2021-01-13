@@ -108,6 +108,34 @@ app.command('/karma-leaderboard-global', async ({ command, ack, client }) => {
         text: build
     })
 })
+
+app.command('/karma-leaderboard-channel', async ({ command, ack, client }) => {
+    await ack()
+    const map = {}
+    const data = await prisma.user.findMany({
+        where: {
+            channelId: command.channel_id
+        }
+    })
+    for (const { id, karmaForChannel } of data) {
+        id in map ? map[id] += karmaForChannel : map[id] = karmaForChannel
+    }
+
+    let sortedTop20 = Object.entries(map).sort(([, a], [, b]) => b - a).slice(0, 20)
+
+    let build = "Hack Club Karma Channel Leaderboard :chart_with_upwards_trend::\n\n"
+
+    for (let i = 0; i < sortedTop20.length; i++) {
+        build += `${i + 1}. <@${sortedTop20[i][0]}>: ${sortedTop20[i][1]}\n`
+    }
+
+    await client.chat.postEphemeral({
+        channel: command.channel_id,
+        user: command.user_id,
+        text: build
+    })
+})
+
 app.command('/karma-global-personal', async ({ command, ack, client }) => {
     await ack()
     console.log(command)
