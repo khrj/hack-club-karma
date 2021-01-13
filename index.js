@@ -46,6 +46,38 @@ app.event("reaction_removed", async ({ event }) => {
     }
 })
 
+async function modifyKarma(amount, user, channel) {
+    const channelObject = await prisma.channel.upsert({
+        where: { id: channel },
+        create: { id: channel },
+        update: {}
+    })
+
+    if (channelObject.enabled) {
+        await prisma.user.upsert({
+            where: {
+                id_channelId: {
+                    id: user,
+                    channelId: channel
+                }
+            },
+            create: {
+                id: user,
+                channel: {
+                    connect: {
+                        id: channel
+                    }
+                },
+                karmaForChannel: amount
+            },
+            update: {
+                karmaForChannel: {
+                    increment: amount
+                }
+            }
+        })
+    }
+}
 async function main() {
     await app.start(process.env.PORT || 3000)
     console.log('⚡️ Bolt app is running!')
