@@ -143,7 +143,6 @@ app.command('/karma-leaderboard-channel', async ({ command, ack, client }) => {
 
 app.command('/karma-global-personal', async ({ command, ack, client }) => {
     await ack()
-    console.log(command)
     const karma = await prisma.user.findMany({
         where: {
             id: command.user_id
@@ -170,7 +169,6 @@ app.command('/karma-global-personal', async ({ command, ack, client }) => {
 
 app.command('/karma-global-user', async ({ command, ack, client }) => {
     await ack()
-    console.log(command)
     const userID = command.text.match(/<@(.*)\|.*>/i)[1]
     if (userID) {
         const karma = await prisma.user.findMany({
@@ -206,7 +204,6 @@ app.command('/karma-global-user', async ({ command, ack, client }) => {
 
 app.command('/karma-channel-personal', async ({ command, ack, client }) => {
     await ack()
-    console.log(command)
     const karma = await prisma.user.findUnique({
         where: {
             id_channelId: {
@@ -231,7 +228,6 @@ app.command('/karma-channel-personal', async ({ command, ack, client }) => {
 
 app.command('/karma-channel-user', async ({ command, ack, client }) => {
     await ack()
-    console.log(command)
     const userID = command.text.match(/<@(.*)\|.*>/i)[1]
     if (userID) {
         const karma = await prisma.user.findUnique({
@@ -265,7 +261,6 @@ app.command('/karma-channel-user', async ({ command, ack, client }) => {
 
 app.command('/karma-distribution-user', async ({ command, ack, client }) => {
     await ack()
-    console.log(command)
     const userID = command.text.match(/<@(.*)\|.*>/i)[1]
     if (userID) {
         let build = `Distribution of <@${userID}>'s Karma:\n`
@@ -284,8 +279,6 @@ app.command('/karma-distribution-user', async ({ command, ack, client }) => {
                 karmaForChannel: 'desc'
             }
         })
-
-        console.log(karma.join)
 
         let totalKarma = 0
         for (const channel of karma) {
@@ -312,7 +305,6 @@ app.command('/karma-distribution-user', async ({ command, ack, client }) => {
 
 app.command('/karma-distribution-personal', async ({ command, ack, client }) => {
     await ack()
-    console.log(command)
 
     let build = "Distribution of your Karma:\n"
 
@@ -330,8 +322,6 @@ app.command('/karma-distribution-personal', async ({ command, ack, client }) => 
             karmaForChannel: 'desc'
         }
     })
-
-    console.log(karma.join)
 
     let totalKarma = 0
     for (const channel of karma) {
