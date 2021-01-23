@@ -1,9 +1,15 @@
-const { App } = require('@slack/bolt')
+const { App, ExpressReceiver } = require('@slack/bolt')
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
-const app = new App({
+
+const receiver = new ExpressReceiver({ 
     signingSecret: process.env.SLACK_SIGNING_SECRET,
+    endpoints: '/slack/events'
+})
+
+const app = new App({
+    receiver,
     token: process.env.SLACK_BOT_TOKEN,
 })
 
@@ -15,7 +21,6 @@ const admins = [
 ]
 
 app.event("reaction_added", async ({ event, client }) => {
-    console.log(event)
     if (event.reaction === "upvote") {
         if (event.user === event.item_user) {
             client.chat.postEphemeral({
@@ -404,6 +409,10 @@ async function main() {
     await app.start(process.env.PORT || 3000)
     console.log('⚡️ Bolt app is running!')
 }
+
+receiver.app.get('/ping', (_, res) => {
+    res.send('Online')
+})
 
 main()
 
