@@ -6,7 +6,7 @@
     "author": "Khushraj Rathod",
     "license": "GPL-3.0",
     "dependencies": {
-        "@prisma/client": "^2.14.0",
+        "@prisma/client": "^2.21.2",
         "@slack/bolt": "^3.3.0"
     },
     "devDependencies": {
