@@ -1,6 +1,6 @@
 {
     "name": "hack-club-karma",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Karma system @hackclub",
     "main": "index.js",
     "author": "Khushraj Rathod",
@@ -10,10 +10,10 @@
         "@slack/bolt": "^3.3.0"
     },
     "devDependencies": {
-        "@prisma/cli": "^2.20.1",
-        "@types/node": "^15.0.1",
-        "ts-node": "^9.1.1",
-        "typescript": "^4.2.4"
+        "@prisma/cli": "2.20.1",
+        "@types/node": "15.0.1",
+        "ts-node": "9.1.1",
+        "typescript": "4.2.4"
     },
     "scripts": {
         "build": "tsc",
